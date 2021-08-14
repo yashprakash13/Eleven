@@ -1,6 +1,7 @@
 """The Index Engine class"""
 import os
 
+import logger
 import whoosh.index as windex
 from brain.data.data_engine import DataEngine
 from utils.constants import (
@@ -11,6 +12,8 @@ from utils.constants import (
 )
 from whoosh.fields import *
 from whoosh.index import create_in
+
+log = logger.get_logger(__name__)
 
 
 class IndexEngine(DataEngine):
@@ -51,10 +54,10 @@ class IndexEngine(DataEngine):
             self._make_psieindex(pair, load_or_not)
 
     def load_psieindices(self):
+        log.debug("Loading psie indices...")
         for pair in self.pairs:
-            if pair == "NoPairs":
-                continue
             self._load_psieindex(pair)
+        log.debug("Loaded psie indices.")
 
     # def _load_sie_ids(self):
     #     embed_tuple = self._read_sie_tuple()

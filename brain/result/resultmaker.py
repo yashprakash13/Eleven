@@ -1,3 +1,6 @@
+import json
+
+import logger
 import pandas as pd
 from brain.result.result_utils import make_continous_appends_for_df, order_rows_from_df
 from utils.constants import (
@@ -6,6 +9,8 @@ from utils.constants import (
     NUM_MAX_RESULT_FETCH,
     STORY_ID_COL_NAME,
 )
+
+log = logger.get_logger(__name__)
 
 
 class ResultMaker:
@@ -28,6 +33,11 @@ class ResultMaker:
         self.df_to_return = None
 
         # start result making
+        log.debug(
+            f"Starting result making. Got: type1title: {self.type1_title_ids}, \
+            type1author: {self.type1_author_names}, type1length: {self.type1_length_name}, \
+            type2summ: {self.type2_summ_ids}"
+        )
         self._perform_result_making()
 
     def _perform_result_making(self):
@@ -41,13 +51,15 @@ class ResultMaker:
 
         if self.type2_summ_ids:
             # process number 1 above
+            log.debug("Doing type2 filtering...")
             self._do_type2_filtering()
-
-        if not self.type1_title_ids:
+        elif not self.type1_title_ids:
             # process number 2.2 above
+            log.debug("Doing type1 filtering without title ids...")
             self._do_type1_filtering(no_title=True)
         else:
             # process number 2.1 above
+            log.debug("Doing type1 filtering with title ids...")
             self._do_type1_filtering()
 
     def _do_type2_filtering(self):
@@ -56,17 +68,24 @@ class ResultMaker:
         self.df_to_return = order_rows_from_df(
             self.indexclass_obj.df, STORY_ID_COL_NAME, self.type2_summ_ids, NUM_MAX_RESULT_FETCH
         )
+        log.debug("Type 2 filter done.")
 
     def _do_type1_filtering(self, no_title=False):
         if no_title:
             # filter only based on special tokens
             self.df_to_return = self._get_special_token_filtered_dataframe()
+            log.debug(f"Type 1 no title filtering done. Returing df of length: {len(self.df_to_return.index.values)}")
         else:
             # filter based on title ids and then special tokens
             dftemp = order_rows_from_df(self.indexclass_obj.df, STORY_ID_COL_NAME, self.type1_title_ids)
             df_special_token_filtered = self._get_special_token_filtered_dataframe(dftemp)
 
-            self.df_to_return = df_special_token_filtered
+            self.df_to_return = (
+                df_special_token_filtered if len(df_special_token_filtered) > 0 else dftemp.head(NUM_MAX_RESULT_FETCH)
+            )
+            log.debug(
+                f"Type 1 with title filtering done. Returing df of length: {len(self.df_to_return.index.values)}"
+            )
 
     def _get_special_token_filtered_dataframe(self, df_to_use=None):
         """
@@ -81,12 +100,16 @@ class ResultMaker:
         if self.type1_author_names:
             dftemp = order_rows_from_df(df_to_use, AUTHOR_COL_NAME, self.type1_author_names)
         if self.type1_length_name:
-            dftemp2 = order_rows_from_df(df_to_use, LENGTH_COL_NAME, self.type1_length_name)
+            dftemp2 = order_rows_from_df(df_to_use, LENGTH_COL_NAME, [self.type1_length_name])
         df_combined_to_return = make_continous_appends_for_df([dftemp, dftemp2])
 
+        log.debug(f"Special token filtered dataframe of length: {len(df_combined_to_return.index.values)}")
         return df_combined_to_return
 
     def get_df_result_as_dict(self):
         """return the result df"""
 
-        return self.df_to_return.to_dict("records")
+        res_list_of_dict = self.df_to_return.to_dict("records")
+        log.debug(f"Returing results list of dicts of length: {len(res_list_of_dict)}")
+
+        return json.dumps(res_list_of_dict)

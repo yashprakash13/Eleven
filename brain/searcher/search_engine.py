@@ -1,3 +1,4 @@
+import logger
 from brain.data.data_engine import stop
 from rapidfuzz import fuzz, process
 from utils.constants import (
@@ -14,6 +15,8 @@ from utils.constants import (
 from whoosh import qparser
 from whoosh.qparser import MultifieldParser, QueryParser
 
+log = logger.get_logger(__name__)
+
 
 class SearchEngine:
     def __init__(self, queryclass_obj, indexclass_obj) -> None:
@@ -27,6 +30,7 @@ class SearchEngine:
         self.type_1_author_result_names = None
 
         # execute the search
+        log.debug("Beginning search...")
         self._begin_search()
 
     def _begin_search(self):
@@ -35,9 +39,11 @@ class SearchEngine:
         # check if the summ token was provided -- TYPE 2 SEARCH
         if self.queryclass_obj.summary_query:
             # Type 2 search only
+            log.debug("Doing type 2 search...")
             self._perform_type2_search()
         else:
             # Type 1 search only
+            log.debug("Doing type 1 search...")
             self._perform_type1_search()
 
     def _perform_type2_search(self):
@@ -49,10 +55,10 @@ class SearchEngine:
         result_ids = []
 
         # search both indices
-        for index in list(ix_hhr, ix_nopairs):
+        for index in list([ix_hhr, ix_nopairs]):
             with index.searcher() as searcher:
                 or_group = qparser.OrGroup.factory(SUMMARY_SCORE_CUTOFF)
-                query = QueryParser(SUMMARY_COL_NAME, index.schema, group=or_group).parse(self.query)
+                query = QueryParser(SUMMARY_COL_NAME, index.schema, group=or_group).parse(self.queryclass_obj.query)
 
                 results = searcher.search(query)
 
@@ -63,6 +69,7 @@ class SearchEngine:
             # save the story ids found
             if ids:
                 result_ids.extend(ids)
+                log.debug(f"Found result ids: {len(result_ids)}")
 
         self.type_2_result_ids = result_ids
 
@@ -82,7 +89,8 @@ class SearchEngine:
             self._do_length_filtering(self.queryclass_obj.length_search_word)
 
         # search for title
-        self._do_title_filtering(self.queryclass_obj.query)
+        if len(self.queryclass_obj.query_spl) > 0:
+            self._do_title_filtering(self.queryclass_obj.query)
 
     def _do_author_filtering(self, author_query):
         """author filtering"""
@@ -123,6 +131,8 @@ class SearchEngine:
         seen = set()
         authors_found = [x for x in authors_found if not (x in seen or seen.add(x))]
 
+        log.debug(f"Author filtering done. Authors found: {len(authors_found)}")
+
         self.type_1_author_result_names = authors_found
 
     def _do_length_filtering(self, length_query):
@@ -137,6 +147,7 @@ class SearchEngine:
     def _do_title_filtering(self, title_query):
         """title search happens here"""
 
+        log.debug(f"Doing title filtering for query: {title_query}")
         df = self.indexclassobj.df
 
         res_r = process.extract(
@@ -169,6 +180,9 @@ class SearchEngine:
         index_list.extend([r[2] for r in res_WR if r[2] not in index_list])
         index_list.extend([r[2] for r in res_r if r[2] not in index_list])
 
-        story_ids_to_return = [df[df.index == i][STORY_ID_COL_NAME].item() for i in index_list]
+        log.debug(f"Title filtering index list length= {len(index_list)}")
+
+        story_ids_to_return = [df[df.index == i][STORY_ID_COL_NAME].iloc[0].item() for i in index_list]
+        log.debug(f"Title filtering done. Titles found: {len(story_ids_to_return)}")
 
         self.type_1_title_result_ids = story_ids_to_return

@@ -69,7 +69,7 @@ class DataEngine:
         self.df[TITLE_WITHOUT_STOPWORDS_COL_NAME] = self.df[TITLE_COL_NAME].apply(
             lambda x: " ".join([word for word in x.split() if word.lower() not in (stop)])
         )
-        log.debug("Loaded una ids.")
+        log.debug(f"Loaded una ids. Df Size= {len(self.df.index.values)}")
 
     def _load_data(self, pair):
         df = self.df[self.df.Pairs.str.contains(pair)]
