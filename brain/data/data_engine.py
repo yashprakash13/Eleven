@@ -1,6 +1,7 @@
 """the DataEngine class"""
 import ast
 
+import logger
 import pandas as pd
 import stopwords
 import whoosh.index as windex
@@ -19,9 +20,12 @@ from utils.constants import (
     TITLE_WITHOUT_STOPWORDS_COL_NAME,
 )
 
+log = logger.get_logger(__name__)
+
 stop = stopwords.get_stopwords("en")
 stop.extend(["Harry", "Potter"])
 stop = [word.lower() for word in stop]
+log.debug("Formed stopwords.")
 
 
 class DataEngine:
@@ -33,6 +37,7 @@ class DataEngine:
         # load all FFN data + HHr AO3 data
         self.df = pd.read_csv(MAIN_EN_DATA_PATH, low_memory=False)
         self.df = pd.concat([self.df, pd.read_csv(HHR_AO3_DATA_PATH)])
+        log.debug("Main data loaded.")
 
     def _get_ids_una_per_row(self, row, chars_present, list_to_append_to):
         if str(row[CHARACTERS_COL_NAME]) != NO_CHARACTERS_COL_VALUE and set(chars_present).issubset(
@@ -50,6 +55,7 @@ class DataEngine:
 
     def load_una_ids(self):
 
+        log.debug("Loading una ids...")
         for pair in self.pairs:
             if pair == NO_PAIRS_COL_VALUE:
                 continue
@@ -63,6 +69,7 @@ class DataEngine:
         self.df[TITLE_WITHOUT_STOPWORDS_COL_NAME] = self.df[TITLE_COL_NAME].apply(
             lambda x: " ".join([word for word in x.split() if word.lower() not in (stop)])
         )
+        log.debug("Loaded una ids.")
 
     def _load_data(self, pair):
         df = self.df[self.df.Pairs.str.contains(pair)]
@@ -75,6 +82,7 @@ class DataEngine:
     def load_temp_data(self):
         """to load newly saved data after a contribute story happened"""
 
+        log.debug("Loading temp data...")
         tempdf = pd.read_csv(MAIN_EN_DATA_PATH, low_memory=False)
         tempdf = pd.concat([tempdf, pd.read_csv(HHR_AO3_DATA_PATH)])
         tempdf[TITLE_WITHOUT_STOPWORDS_COL_NAME] = tempdf[TITLE_COL_NAME].apply(
@@ -89,3 +97,5 @@ class DataEngine:
 
         del tempdf
         del data_temp
+
+        log.debug("Loaded temp data.")
