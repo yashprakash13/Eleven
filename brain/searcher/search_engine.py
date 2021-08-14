@@ -8,6 +8,7 @@ from utils.constants import (
     STANDARD_LENGTHS_TO_RETURN,
     STANDARD_SCORE_CUTOFF,
     STORY_ID_COL_NAME,
+    SUBSTANDARD_SCORE_CUTOFF,
     SUMMARY_COL_NAME,
     SUMMARY_SCORE_CUTOFF,
     TITLE_WITHOUT_STOPWORDS_COL_NAME,
@@ -150,23 +151,15 @@ class SearchEngine:
         log.debug(f"Doing title filtering for query: {title_query}")
         df = self.indexclassobj.df
 
-        res_r = process.extract(
-            " ".join([word for word in title_query.split() if word.lower() not in (stop)]),
-            df[TITLE_WITHOUT_STOPWORDS_COL_NAME],
-            scorer=fuzz.ratio,
-            limit=STANDARD_LENGTHS_TO_RETURN,
-            score_cutoff=STANDARD_SCORE_CUTOFF,
-        )
-        res_WR = process.extract(
-            " ".join([word for word in title_query.split() if word.lower() not in (stop)]),
-            df[TITLE_WITHOUT_STOPWORDS_COL_NAME],
-            scorer=fuzz.WRatio,
-            limit=STANDARD_LENGTHS_TO_RETURN,
-            score_cutoff=STANDARD_SCORE_CUTOFF,
-        )
+        res_r, res_WR = self._title_filtering_helper(df, title_query)
+        # if no results, decrease the threshold a bit
+        if not res_r or not res_WR:
+            log.debug("No title results with standard threshold. Trying with a decreased one.")
+            res_r, res_WR = self._title_filtering_helper(df, title_query, SUBSTANDARD_SCORE_CUTOFF)
 
         # if no results, do nothing
         if not res_r or not res_WR:
+            log.debug("No title results even with sub-standard threshold.")
             return
 
         if res_r[0][2] != res_WR[0][2]:
@@ -186,3 +179,23 @@ class SearchEngine:
         log.debug(f"Title filtering done. Titles found: {len(story_ids_to_return)}")
 
         self.type_1_title_result_ids = story_ids_to_return
+
+    def _title_filtering_helper(self, df, title_query, score_cutoff=STANDARD_SCORE_CUTOFF):
+        """use title filtering mechanism acco to set threshold"""
+
+        res_r = process.extract(
+            " ".join([word for word in title_query.split() if word.lower() not in (stop)]),
+            df[TITLE_WITHOUT_STOPWORDS_COL_NAME],
+            scorer=fuzz.ratio,
+            limit=STANDARD_LENGTHS_TO_RETURN,
+            score_cutoff=score_cutoff,
+        )
+        res_WR = process.extract(
+            " ".join([word for word in title_query.split() if word.lower() not in (stop)]),
+            df[TITLE_WITHOUT_STOPWORDS_COL_NAME],
+            scorer=fuzz.WRatio,
+            limit=STANDARD_LENGTHS_TO_RETURN,
+            score_cutoff=score_cutoff,
+        )
+
+        return res_r, res_WR
