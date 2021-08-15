@@ -29,6 +29,7 @@ class SearchEngine:
         self.type_1_title_result_ids = None
         self.type_1_length_result_name = None
         self.type_1_author_result_names = None
+        self.type_3_is_complete = False
 
         # execute the search
         log.debug("Beginning search...")
@@ -46,6 +47,11 @@ class SearchEngine:
             # Type 1 search only
             log.debug("Doing type 1 search...")
             self._perform_type1_search()
+
+        # at last, see if complete filter is mentioned
+        if self.queryclass_obj.is_complete_mentioned:
+            # filter for only complete fics to show
+            self.type_3_is_complete = True
 
     def _perform_type2_search(self):
         """type 2 search"""

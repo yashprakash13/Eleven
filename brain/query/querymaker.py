@@ -1,6 +1,7 @@
 import logger
 from utils.constants import (
     AUTHOR_SEARCH_TOKEN,
+    COMPLETE_TOKEN,
     LENGTH_SEARCH_TOKEN,
     SPECIAL_SEARCH_TOKENS,
     SUMM_TOKEN,
@@ -18,6 +19,7 @@ class QueryMaker:
         self.author_search_word = None
         self.length_search_word = None
         self.summary_query = False
+        self.is_complete_mentioned = False
 
         # process query
         log.debug("Inside Querymaker init...")
@@ -27,6 +29,7 @@ class QueryMaker:
         """execute processing of the query"""
 
         self._make_query()
+        self._perform_complete_token_sweep()
         self._perform_summ_token_sweep()
         self._perform_special_token_sweep()
 
@@ -98,3 +101,10 @@ class QueryMaker:
             self.query = self.query.replace(SUMM_TOKEN, "")
             log.debug(f"Summ given: {self.summary_query}")
             log.debug(f"New query={self.summary_query}")
+
+    def _perform_complete_token_sweep(self):
+        """search for complete token mentioned in the query"""
+
+        if COMPLETE_TOKEN == self.query_full_spl[-1]:
+            log.debug("Complete token found.")
+            self.is_complete_mentioned = True

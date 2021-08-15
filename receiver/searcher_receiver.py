@@ -51,6 +51,7 @@ class SearcherReceiver:
             search_engine.type_1_author_result_names,
             search_engine.type_1_length_result_name,
             search_engine.type_2_result_ids,
+            search_engine.type_3_is_complete,
         )
         result_list_of_dict = results_list.get_df_result_as_dict()
 

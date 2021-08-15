@@ -7,6 +7,8 @@ from utils.constants import (
     AUTHOR_COL_NAME,
     LENGTH_COL_NAME,
     NUM_MAX_RESULT_FETCH,
+    STATUS_COL_NAME,
+    STATUS_COMPLETE_COL_VALUE,
     STORY_ID_COL_NAME,
 )
 
@@ -21,6 +23,7 @@ class ResultMaker:
         type1_author_names=None,
         type1_length_name=None,
         type2_summ_ids=None,
+        type3_complete_status=False,
     ):
         self.indexclass_obj = indexclass_obj
 
@@ -28,6 +31,7 @@ class ResultMaker:
         self.type1_author_names = type1_author_names
         self.type1_length_name = type1_length_name
         self.type2_summ_ids = type2_summ_ids
+        self.type3_complete_status = type3_complete_status
 
         # the result dataframe
         self.df_to_return = None
@@ -36,7 +40,7 @@ class ResultMaker:
         log.debug(
             f"Starting result making. Got: type1title: {self.type1_title_ids}, \
             type1author: {self.type1_author_names}, type1length: {self.type1_length_name}, \
-            type2summ: {self.type2_summ_ids}"
+            type2summ: {self.type2_summ_ids}, complete or not: {self.type3_complete_status}"
         )
         self._perform_result_making()
 
@@ -61,6 +65,11 @@ class ResultMaker:
             # process number 2.1 above
             log.debug("Doing type1 filtering with title ids...")
             self._do_type1_filtering()
+
+        # finally, check the complete status required or not
+        if self.type3_complete_status:
+            log.debug("Doing complete status filtering for result to return...")
+            self._filter_for_complete_status()
 
     def _do_type2_filtering(self):
         """type 2 result making"""
@@ -90,7 +99,6 @@ class ResultMaker:
     def _get_special_token_filtered_dataframe(self, df_to_use=None):
         """
         all special token filter + appends happen here, can be added more in the future
-        TODO: Filter for story "Complete" status also
         """
 
         if df_to_use is None:
@@ -105,6 +113,11 @@ class ResultMaker:
 
         log.debug(f"Special token filtered dataframe of length: {len(df_combined_to_return.index.values)}")
         return df_combined_to_return
+
+    def _filter_for_complete_status(self):
+        """filter only complete stories"""
+
+        self.df_to_return = self.df_to_return.loc[self.df_to_return[STATUS_COL_NAME] == STATUS_COMPLETE_COL_VALUE]
 
     def get_df_result_as_dict(self):
         """return the result df"""

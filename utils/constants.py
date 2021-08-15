@@ -40,6 +40,7 @@ MEDIUM_FFN_COL_VALUE = "FFN"
 MEDIUM_AO3_COL_VALUE = "AO3"
 NOT_AVAILABLE_AUTHOR_COL_VALUE = "NotAvailable"
 NO_PAIRS_COL_VALUE = "NoPairs"
+STATUS_COMPLETE_COL_VALUE = "Complete"
 
 # column names
 CHARACTERS_COL_NAME = "characters"
@@ -49,6 +50,7 @@ TITLE_COL_NAME = "title"
 SUMMARY_COL_NAME = "summary"
 AUTHOR_COL_NAME = "author_name"
 LENGTH_COL_NAME = "Lengths"
+STATUS_COL_NAME = "status"
 
 
 DEFAULT_PAIR = "Harmony"  # Yes, because that's MY ship. Period.
@@ -84,6 +86,8 @@ SPECIAL_SEARCH_TOKENS = ["a:", "l:"]
 AUTHOR_SEARCH_TOKEN = "a:"
 LENGTH_SEARCH_TOKEN = "l:"
 SUMM_TOKEN = "s:"
+COMPLETE_TOKEN = "complete"
+
 
 STANDARD_LENGTHS_TO_RETURN = 10
 STANDARD_SCORE_CUTOFF = 75
