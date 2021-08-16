@@ -6,7 +6,9 @@ import whoosh.index as windex
 from brain.data.data_engine import DataEngine
 from utils.constants import (
     DEFAULT_PAIR,
+    MEDIUM_COL_NAME,
     NO_PAIRS_COL_VALUE,
+    PAIRS_COL_NAME,
     PAIRS_TO_LOOK_FOR,
     PSIE_INDEX_PATH,
     STORY_ID_COL_NAME,
@@ -65,7 +67,18 @@ class IndexEngine(DataEngine):
 
         log.debug("Fetching story details...")
         row = self.df.loc[self.df[STORY_ID_COL_NAME] == storyid]
+        log.debug("Story details fetched.")
         return row
+
+    def get_all_fics(self, medium=None):
+        """to get and return to receiver all stories of "Medium" column value"""
+
+        log.debug("Fetching all fics...")
+        return (
+            self.df.loc[(self.df[PAIRS_COL_NAME] == DEFAULT_PAIR) & (self.df[MEDIUM_COL_NAME] == medium)]
+            if medium
+            else self.df.loc[self.df[PAIRS_COL_NAME] == DEFAULT_PAIR]
+        )
 
     # def _load_sie_ids(self):
     #     embed_tuple = self._read_sie_tuple()

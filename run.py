@@ -30,7 +30,7 @@ async def root():
 
 @app.get("/search")
 async def search(query: str):
-    """the search point"""
+    """The search point"""
 
     log.debug(f"Calling searcher with query: {query}")
     results = searcher_receiver.search(query=query)
@@ -38,9 +38,23 @@ async def search(query: str):
 
 
 @app.get("/get_story_details")
-async def get_stort_details(storyid: int):
-    """return story details from id"""
+async def get_story_details(storyid: int):
+    """Return story details from id"""
 
     log.debug(f"Calling story detail endpoint with storyid= {storyid}")
     details = searcher_receiver.get_story_details(story_id=int(storyid))
     return {"story_details": details}
+
+
+@app.get("/get_all_fics")
+async def get_all_fics(choice=0):
+    """
+    Return all HHr fics with the criteria:
+    0 = All
+    1 = FFN only
+    2 = AO3 only
+    """
+
+    log.debug(f"Getting all fics with option = {choice}")
+    allfics = searcher_receiver.get_all_fics(choice=choice)
+    return {"all_fics": allfics}

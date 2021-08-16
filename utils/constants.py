@@ -51,6 +51,8 @@ SUMMARY_COL_NAME = "summary"
 AUTHOR_COL_NAME = "author_name"
 LENGTH_COL_NAME = "Lengths"
 STATUS_COL_NAME = "status"
+MEDIUM_COL_NAME = "Medium"
+PAIRS_COL_NAME = "Pairs"
 
 
 DEFAULT_PAIR = "Harmony"  # Yes, because that's MY ship. Period.

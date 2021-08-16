@@ -4,6 +4,7 @@ from brain.index.index_engine import IndexEngine
 from brain.query.querymaker import QueryMaker
 from brain.result.resultmaker import ResultMaker
 from brain.searcher.search_engine import SearchEngine
+from utils.constants import MEDIUM_AO3_COL_VALUE, MEDIUM_FFN_COL_VALUE
 
 
 class SearcherReceiver:
@@ -68,3 +69,18 @@ class SearcherReceiver:
         """get story details from db and return dataframe row as json"""
 
         return json.dumps(self.indexclass_obj.get_story_details(story_id).to_dict("records"))
+
+    def get_all_fics(self, choice):
+        """return all fics with "Medium" of "choice"""
+
+        if choice == 0:
+            # all fics
+            allfics = self.indexclass_obj.get_all_fics()
+        elif choice == 1:
+            # only FFN fics
+            allfics = self.indexclass_obj.get_all_fics(MEDIUM_FFN_COL_VALUE)
+        else:
+            # only AO3 fics
+            allfics = self.indexclass_obj.get_all_fics(MEDIUM_AO3_COL_VALUE)
+
+        return json.dumps(allfics.to_dict("records"))
