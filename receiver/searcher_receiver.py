@@ -1,3 +1,5 @@
+import json
+
 from brain.index.index_engine import IndexEngine
 from brain.query.querymaker import QueryMaker
 from brain.result.resultmaker import ResultMaker
@@ -61,3 +63,8 @@ class SearcherReceiver:
         """to return list of dict of results gotten"""
 
         return self.result_to_return
+
+    def get_story_details(self, story_id):
+        """get story details from db and return dataframe row as json"""
+
+        return json.dumps(self.indexclass_obj.get_story_details(story_id).to_dict("records"))

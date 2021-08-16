@@ -35,3 +35,12 @@ async def search(query: str):
     log.debug(f"Calling searcher with query: {query}")
     results = searcher_receiver.search(query=query)
     return {"results": results}
+
+
+@app.get("/get_story_details")
+async def get_stort_details(storyid: int):
+    """return story details from id"""
+
+    log.debug(f"Calling story detail endpoint with storyid= {storyid}")
+    details = searcher_receiver.get_story_details(story_id=int(storyid))
+    return {"story_details": details}

@@ -9,6 +9,7 @@ from utils.constants import (
     NO_PAIRS_COL_VALUE,
     PAIRS_TO_LOOK_FOR,
     PSIE_INDEX_PATH,
+    STORY_ID_COL_NAME,
 )
 from whoosh.fields import *
 from whoosh.index import create_in
@@ -58,6 +59,13 @@ class IndexEngine(DataEngine):
         for pair in self.pairs:
             self._load_psieindex(pair)
         log.debug("Loaded psie indices.")
+
+    def get_story_details(self, storyid):
+        """to get story detail row from db and return to receiver"""
+
+        log.debug("Fetching story details...")
+        row = self.df.loc[self.df[STORY_ID_COL_NAME] == storyid]
+        return row
 
     # def _load_sie_ids(self):
     #     embed_tuple = self._read_sie_tuple()
