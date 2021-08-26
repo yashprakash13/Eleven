@@ -1,5 +1,6 @@
 """The Index Engine class"""
 import os
+from threading import Thread
 
 import logger
 import whoosh.index as windex
@@ -66,7 +67,7 @@ class IndexEngine(DataEngine):
         """to get story detail row from db and return to receiver"""
 
         log.debug("Fetching story details...")
-        row = self.df.loc[self.df[STORY_ID_COL_NAME] == storyid]
+        row = self.df.loc[self.df[STORY_ID_COL_NAME] == int(storyid)]
         log.debug("Story details fetched.")
         return row
 
@@ -79,6 +80,16 @@ class IndexEngine(DataEngine):
             if medium
             else self.df.loc[self.df[PAIRS_COL_NAME] == DEFAULT_PAIR]
         )
+
+    def save_story(self, storyid, medium):
+        """to save story to csvdb"""
+
+        # TODO fetch metadata and make the storydict here.
+        self.df.append(storydict, ignore_index=True)
+
+        # load newly saved data in a background thread
+        background_thread = Thread(target=self.load_temp_data)
+        background_thread.start()
 
     # def _load_sie_ids(self):
     #     embed_tuple = self._read_sie_tuple()

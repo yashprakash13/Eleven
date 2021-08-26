@@ -53,6 +53,7 @@ LENGTH_COL_NAME = "Lengths"
 STATUS_COL_NAME = "status"
 MEDIUM_COL_NAME = "Medium"
 PAIRS_COL_NAME = "Pairs"
+GENRES_COL_NAME = "genres"
 
 
 DEFAULT_PAIR = "Harmony"  # Yes, because that's MY ship. Period.
@@ -141,3 +142,7 @@ COL_NAME_STORY = ["title"]
 
 # API THINGS
 API_URL_TO_FETCH_STORIES_META_FROM = "https://weaver.fanfic.dev/v0/ffn/crawl"
+
+FFN_START_STRING = "fanfiction.net"
+AO3_START_STRING = "archiveofourown.org"
+RATE_LIMIT = 2

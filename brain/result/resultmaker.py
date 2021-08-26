@@ -124,5 +124,4 @@ class ResultMaker:
 
         res_list_of_dict = self.df_to_return.to_dict("records")
         log.debug(f"Returing results list of dicts of length: {len(res_list_of_dict)}")
-
         return json.dumps(res_list_of_dict)

@@ -84,3 +84,13 @@ class SearcherReceiver:
             allfics = self.indexclass_obj.get_all_fics(MEDIUM_AO3_COL_VALUE)
 
         return json.dumps(allfics.to_dict("records"))
+
+    def save_new_story(self, storyid, medium):
+        """save new story to csvdb"""
+
+        if medium == 1:
+            # save as FFN story
+            self.indexclass_obj.save_story(storyid, MEDIUM_FFN_COL_VALUE)
+        elif medium == 2:
+            # save as AO3 story
+            self.indexclass_obj.save_story(storyid, MEDIUM_AO3_COL_VALUE)

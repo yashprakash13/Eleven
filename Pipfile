@@ -13,6 +13,11 @@ numpy = "*"
 whoosh = "*"
 stopwords = "*"
 rapidfuzz = "*"
+pydantic = "*"
+python-dotenv = "*"
+requests = "*"
+beautifulsoup4 = "*"
+ao3-api = "*"
 
 [dev-packages]
 
