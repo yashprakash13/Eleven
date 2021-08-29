@@ -2,7 +2,15 @@ import logger
 from utils.constants import (
     AUTHOR_SEARCH_TOKEN,
     COMPLETE_TOKEN,
+    FANDOM_MARKER_PRIDE_AND_PREJUDICE,
+    FANDOM_MARKER_SEX_EDUCATION,
+    FANDOM_MARKER_STRANGER_THINGS,
+    FANDOM_TAG_PRIDE_AND_PREJUDICE,
+    FANDOM_TAG_SEX_EDUCATION,
+    FANDOM_TAG_STRANGER_THINGS,
     LENGTH_SEARCH_TOKEN,
+    OTHER_SUPPORTED_FANDOMS,
+    OTHER_SUPPORTED_FANDOMS_MARKERS,
     SPECIAL_SEARCH_TOKENS,
     SUMM_TOKEN,
 )
@@ -20,6 +28,10 @@ class QueryMaker:
         self.length_search_word = None
         self.summary_query = False
         self.is_complete_mentioned = False
+
+        # other fandom marker things
+        self.is_other_fandom_maker_present = False
+        self.other_fandom_marker = None
 
         # process query
         log.debug("Inside Querymaker init...")
@@ -40,8 +52,28 @@ class QueryMaker:
 
         log.debug(f"Making new query...for {self.query}")
         self.query_full_spl = self.query.lower().strip().split(" ")
-        self.query_spl = [word for word in self.query_full_spl if word[:2] not in SPECIAL_SEARCH_TOKENS]
+        self.query_spl = [
+            word
+            for word in self.query_full_spl
+            if word[:2] not in SPECIAL_SEARCH_TOKENS
+            if word not in OTHER_SUPPORTED_FANDOMS_MARKERS
+        ]
         self.query_special_spl = [word for word in self.query_full_spl if word[:2] in SPECIAL_SEARCH_TOKENS]
+        self.query_special_spl.extend(
+            [word for word in self.query_full_spl if word in OTHER_SUPPORTED_FANDOMS_MARKERS]
+        )
+
+        # check for which other fandom marker present, if yes
+        if FANDOM_MARKER_STRANGER_THINGS in self.query_special_spl:
+            self.is_other_fandom_maker_present = True
+            self.other_fandom_marker = FANDOM_TAG_STRANGER_THINGS
+        elif FANDOM_MARKER_PRIDE_AND_PREJUDICE in self.query_special_spl:
+            self.is_other_fandom_maker_present = True
+            self.other_fandom_marker = FANDOM_TAG_PRIDE_AND_PREJUDICE
+        elif FANDOM_MARKER_SEX_EDUCATION in self.query_special_spl:
+            self.is_other_fandom_maker_present = True
+            self.other_fandom_marker = FANDOM_TAG_SEX_EDUCATION
+
         self.query = " ".join(self.query_spl).strip()
         log.debug(
             f"Made new query: {self.query}, query split: {self.query_spl}, query spl split: {self.query_special_spl}, query full split: {self.query_full_spl}"

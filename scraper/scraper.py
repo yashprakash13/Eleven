@@ -15,6 +15,9 @@ from utils.constants import (
     FFN_START_STRING,
     GENRES_COL_NAME,
     LENGTH_COL_NAME,
+    MEDIUM_AO3_COL_VALUE,
+    MEDIUM_COL_NAME,
+    MEDIUM_FFN_COL_VALUE,
     NO_PAIRS_COL_VALUE,
     PAIRS_COL_NAME,
     RATE_LIMIT,
@@ -52,6 +55,8 @@ class Scraper:
         """
 
         log.debug("Performing post scraping actions...")
+        self.master_df[MEDIUM_COL_NAME] = MEDIUM_FFN_COL_VALUE
+
         # make the Lengths column
         self.master_df[LENGTH_COL_NAME] = self.master_df.apply(lambda row: self.get_length(row), axis=1)
 
@@ -111,6 +116,7 @@ class Scraper:
         result = [d for d in feeddict if d is not None]
         log.debug("Saving scraped file...")
         df = pd.DataFrame(result)
+        df[MEDIUM_COL_NAME] = MEDIUM_AO3_COL_VALUE
 
         os.makedirs(os.path.join("data", self.name), exist_ok=True)
         filenameandpath = os.path.join("data", self.name, f"meta{self.name}_{self.start_page}_{self.end_page}_ao3.csv")

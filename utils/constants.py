@@ -146,3 +146,13 @@ API_URL_TO_FETCH_STORIES_META_FROM = "https://weaver.fanfic.dev/v0/ffn/crawl"
 FFN_START_STRING = "fanfiction.net"
 AO3_START_STRING = "archiveofourown.org"
 RATE_LIMIT = 2
+
+# other fandoms I'm supporting
+OTHER_SUPPORTED_FANDOMS = ("st", "se", "pp")
+OTHER_SUPPORTED_FANDOMS_MARKERS = [":st:", ":se:", ":pp:"]
+FANDOM_TAG_STRANGER_THINGS = "st"
+FANDOM_TAG_SEX_EDUCATION = "se"
+FANDOM_TAG_PRIDE_AND_PREJUDICE = "pp"
+FANDOM_MARKER_STRANGER_THINGS = ":st:"
+FANDOM_MARKER_SEX_EDUCATION = ":se:"
+FANDOM_MARKER_PRIDE_AND_PREJUDICE = ":pp:"
